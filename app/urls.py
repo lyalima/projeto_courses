@@ -26,4 +26,5 @@ urlpatterns = [
     path('courses/', CoursesListView.as_view(), name='courses_list_view'),
     path('course/<int:pk>/', CourseDetailView.as_view(), name='course_detail_view'),
     path('vacancies/', VacanciesListView.as_view(), name='vacancies_list_view'),
+    path('health/', health_check, name='health_check'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

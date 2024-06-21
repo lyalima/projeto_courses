@@ -13,6 +13,7 @@ from courses.models import Course, CourseCategory
 from django.http import JsonResponse
 import requests
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+from django.http import HttpResponse
 
 
 class RegisterView(CreateView):
@@ -234,3 +235,9 @@ def check_zipcode_view(request):
                 return JsonResponse(data)
             
     return JsonResponse({'error': 'CEP inválido'}, status=400)
+
+
+#view para verificação de integridade feita pelo asg aws:
+def health_check(request):
+    
+    return HttpResponse("OK", status=200)
