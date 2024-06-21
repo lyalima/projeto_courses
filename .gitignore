@@ -2,5 +2,7 @@ media/
 venv/
 .env
 uwsgi_params
+cursos_uwsgi.ini
+
 
 
