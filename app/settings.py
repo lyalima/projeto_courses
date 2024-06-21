@@ -78,7 +78,7 @@ DATABASES = {
         'NAME': 'cursos',
         'USER': 'postgres',
         'PASSWORD': config('PASSWD_POSTGRESQL'),
-        'HOST': 'localhost',
+        'HOST': 'cursos.cp0mm8k0ktpn.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
