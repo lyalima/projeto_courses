@@ -1,0 +1,98 @@
+{% extends "courses/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <title>{% block title %}Verificação de Email{% endblock %}</title>
+    </head>
+    <style>
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+      
+        .btn {
+            display: inline-block;
+            background-color: #0096c7;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            margin: 0 10px;
+        }
+      
+        .btn:hover {
+            background-color: #108eb8;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        h4 {
+            text-align: center;
+        }
+
+        ul.messages {
+            padding: 0;
+        }
+
+        ul.messages li {
+            list-style: none;
+        }
+
+        .conteudo {
+            min-height: calc(50vh - 20px);
+            padding-bottom: 40px;
+            overflow: auto;
+        }
+
+        .rodape {
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            height: 20px;
+          }
+    </style>
+    <body>
+        <div class="text-center mb-5">
+            <a href="https://www.flaticon.com/br/icones-gratis/enviei" target="_blank"><img width="7%" class="icone-check my-3" src="{% static 'img/mensagem.png' %}"></a>
+            <h2>Verificação de email</h2>
+        </div>
+        <h4>Enviamos um código de verificação para o email fornecido.</h4>
+        <br>
+        <h4>Por favor, digite abaixo o código enviado para confirmar o email.</h4>
+        <br>
+        <div class="conteudo row gx-5 justify-content-center">
+            {% if messages %}
+                <ul class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %}class="alert {{ message.tags }}" {% endif %}> {{ message }}</li> 
+                {% endfor %}
+                </ul>
+            {% endif %}
+            <div class="col-lg-6">
+                <form method="post" class="form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mb-3 form-check d-flex justify-content-between align-items-center">
+                    </div>
+                    <div class="buttons-container">
+                        <button class="btn btn-secondary" id="submitButton" type="submit">Verificar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% block scripts %}
+        {% endblock %}
+    </body>
+</html>
+{% endblock %}

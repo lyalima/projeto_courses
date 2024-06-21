@@ -1,0 +1,96 @@
+{% extends "courses/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .buttons-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+  
+    .btn {
+        display: inline-block;
+        background-color: #0096c7;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+        margin: 0 10px;
+    }
+  
+    .btn:hover {
+        background-color: #108eb8;
+    }
+
+    ul.messages {
+        padding: 0;
+    }
+
+    ul.messages li {
+        list-style: none;
+    }
+</style>
+<section class="bg-light py-5">
+    {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            <li {% if message.tags %}class="alert {{ message.tags }}" {% endif %}> {{ message }}</li> 
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <div class="container px-5 my-3 px-5">
+        <div class="text-center mb-5">
+            <a href="https://www.flaticon.com/br/icones-gratis/conecte-se" target="_blank"><img width="7%" class="icone-login" src="{% static 'img/login.png' %}"></a>
+            <h2 class="fw-bolder my-3"> Login </h2>
+        </div>
+        <div class="row gx-5 justify-content-center">
+            <div class="col-lg-6">
+                <form method="post" class="form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mb-3 form-check d-flex justify-content-between align-items-center">
+                        <div>
+                            <input type="checkbox" class="form-check-input" id="showPassword">
+                            <label class="form-check-label" for="showPassword">Ver Senha</label>
+                        </div>
+                        <div class="text-end">
+                            <a href="{% url 'password_reset_view' %}">Esqueci a senha</a> 
+                        </div>
+                    </div>
+                    <div class="buttons-container">
+                        <button class="btn btn-secondary" id="submitButton" type="submit">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        $('#showPassword').click(function(){
+            var passwordField = $('#id_password');
+            var checkbox = $(this);
+
+            if(passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                checkbox.prop('checked', true);
+                checkbox.next('label').text('Ocultar Senha');
+            } else {
+                passwordField.attr('type', 'password');
+                checkbox.prop('checked', false);
+                checkbox.next('label').text('Ver Senha');
+            }
+        });
+    });
+</script>
+{% endblock %}

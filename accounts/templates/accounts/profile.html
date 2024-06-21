@@ -1,0 +1,197 @@
+{% extends "courses/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link href="{% static 'fontawesome/css/all.css' %}" rel="stylesheet">
+        <title>{% block head %}Perfil{% endblock %}</title>
+    </head>
+    <style>
+        .user-card {
+            background-color: #e3e1e1;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            text-align: center;
+            transition: all 0.3s ease;
+            max-width: 500px;
+            margin: 20px auto 0;
+            margin-bottom: 20px;
+            min-height: calc(20vh - 10px);
+            padding-bottom: 40px;
+            overflow: auto;
+        }
+      
+        .user-card:hover {
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+      
+        .user-card img {
+            width: 50%;
+            user-fit: cover;
+        }
+      
+        .user-card h2 {
+            font-size: 1.5rem;
+            margin: 10px;
+        }
+      
+        .user-card p {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+      
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+      
+        .btn {
+            display: inline-block;
+            background-color: #0096c7;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            margin: 0 10px;
+        }
+      
+        .btn:hover {
+            background-color: #108eb8;
+        }
+      
+        .btn-danger {
+            background-color: #d9534f;
+            text-decoration: none !important;
+        }
+      
+        .btn-danger:hover {
+            background-color: #d2221c;
+        }
+      
+        .error-message {
+            color: #d9534f;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+      
+        a {
+            text-decoration: none !important;
+        }
+
+        h3, h5 {
+            text-align: center; 
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #0096c7;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            margin: 0 10px;
+        }
+      
+        .btn:hover {
+            background-color: #108eb8;
+        }
+
+        ul.messages {
+              padding: 0;
+            }
+
+        ul.messages li {
+            list-style: none;
+        }
+
+        i {
+            color: #333;
+            font-size: 2em;
+        }
+
+        .rodape {
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+          }
+        </style>
+    <body>
+        {% block main %}
+        <main>
+        <a title="Voltar" href={% url 'courses_list_view' %}><i class="fa fa-arrow-circle-left mx-5 my-3" aria-hidden="true"></i></a>
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li {% if message.tags %}class="alert {{ message.tags }}" {% endif %}> {{ message }}</li> 
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <div class="container px-5 my-5 px-5">
+            <div class="text-center mb-5">
+                <div class="text-center mb-5">
+                    <a href="https://www.flaticon.com/br/icones-gratis/carteira" target="_blank"><img width="7%" class="icone-cadastro" src="{% static 'img/perfil-pessoal.png' %}"></a>
+                    <h4 class="fw-bolder my-3"> Seu Perfil </h4>
+                </div>
+                <div class="row gx-5 justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="user-card">
+                            {% if user.photo %}
+                                <img src="{{ user.photo.url }}">
+                            {% else %}
+                                <a href="https://www.flaticon.com/br/icones-gratis/perfil"><img src="{% static 'img/perfil-foto.png' %}"></a>
+                            {% endif %}
+                            <br>
+                            <br>
+                            <h5> Nome: {{ object.full_name }} </h5>
+                            <h5> Usuário: {{ object.username }} </h5>
+                            <h5> Email: {{ object.email }} </h5>
+                            <h5> Telefone: {{ object.telephone }} </h5>
+                            <h5> CPF: {{ object.cpf }} </h5>
+                            <h5> Data de Nascimento: {{ object.date_of_birth }} </h5>
+                            <h5> CEP: {{ object.zip_code }} </h5>
+                            <h5> Endereço: {{ object.address }} </h5>
+                            <h5> Número: {{ object.number }} </h5>
+                            <h5> Bairro: {{ object.neighborhood }} </h5>
+                            <h5> Cidade: {{ object.city }} </h5>
+                            <h5> Estado: {{ object.state }} </h5>
+                            <h5> Escolaridade: {{ object.education }} </h5>
+                            <h5>Áreas de Interesse:</h5>
+                            {% for area in user.areas_of_interest %}
+                                <h5>-{{ area }}</h5>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="buttons-container">
+                        <a href="{% url 'profile_update_view' pk=object.pk %}" class="btn btn-secondary"> Editar Dados </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </main>
+        {% endblock %}
+    </body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "courses/base.html" %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Vagas{% endblock %}</title>
+        <style>
+          button[type="submit"] {
+              background-color: #333;
+              color: #fff;
+              border: none;
+              padding: 10px 20px;
+              font-size: 16px;
+              border-radius: 4px;
+              cursor: pointer;
+              transition: background-color 0.3s ease-in-out;
+          }
+
+          .pagination {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+          }
+
+          .pagination .step-links {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+          }
+        </style>
+    </head>
+    <body>
+      <div class="col-md-6 my-4"> 
+            <form method="get" action="{% url 'vacancies_list_view' %}" class="d-flex">
+              <select class="form-select me-2" name="category">
+                  <option value="" {% if not request.GET.category %} selected {% endif %}>Todas as Categorias</option>
+                    {% for category in categories %}
+                      <option value="{{ category.id }}" {% if request.GET.category == category.id %} selected {% endif %}>{{ category.category_name }}</option>
+                    {% endfor %}
+              </select>
+              <button type="submit" class="btn btn-primary">Filtrar</button>
+            </form>
+      </div>
+      {% if selected_category %}
+        <h3 class="mx-5">Resultados para o filtro "{{ selected_category.category_name }}"</h3>
+        <hr>
+      {% else %}
+        <h3 class="mx-5"> Todas as vagas </h3>
+        <hr>
+      {% endif %}
+      <div class="table-responsive">
+        <table class="table table-striped my-2">
+          <tr>
+            <th>Categoria</th>
+            <th>Subcategoria</th>
+            <th>Site</th>
+            <th>Opções</th>
+          </tr>
+            {% if vacancies %}
+              {% for vacancy in vacancies %}
+                <tr>
+                  <td>{{ vacancy.vacancy_category }}</td>
+                  <td>{{ vacancy.vacancy_subcategory }}</td>
+                  <td>{{ vacancy.vacancy_site }}</td>
+                  <td>
+                    <a href="{{ vacancy.vacancy_link }}" target="_blank" class="btn btn-success btn-sm">Acessar</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <p class="no-results">Nenhuma vaga encontrada.</p>
+            {% endif %}
+        </table>
+        </div>
+        <!-- Paginação -->
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; Primeira</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                {% endif %}
+            </span>
+            <span class="step-links">
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                {% endif %}
+            </span>
+            <span class="current">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+            </span>
+        </div>
+    </body>
+</html>
+{% endblock %}
+
+
+
+

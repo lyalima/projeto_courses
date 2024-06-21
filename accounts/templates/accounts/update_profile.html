@@ -1,0 +1,90 @@
+{% extends "courses/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <title>{% block title %}Editar Perfil{% endblock %}</title>
+    </head>
+    <style>
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #0096c7;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            margin: 0 10px;
+          }
+      
+        .btn:hover {
+            background-color: #108eb8;
+        }
+    </style>
+    <body>
+        <section class="bg-light py-5">
+            <div class="container px-5 my-5 px-5">
+                <div class="text-center mb-5">
+                    </div>
+                    <div class="text-center mb-5">
+                    <a href="https://www.flaticon.com/br/icones-gratis/editar" target="_blank"><img width="7%" class="icone-cadastro" src="{% static 'img/editar-perfil.png' %}"></a>
+                    <h2 class="fw-bolder my-3"> Editar Perfil </h2>
+                    </div>
+                </div>
+                <div class="row gx-5 justify-content-center">
+                    <div class="col-lg-6">
+                        <form method="post" class="form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <div class="buttons-container">
+                                <input type="submit" value="Salvar Alterações" class="btn btn-primary my-4">
+                                <a href="{% url 'profile_detail_view' pk=user.pk %}" class="btn btn-primary my-4">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% block scripts %}
+            <script src="{% static 'js/jquery.mask.min.js'%}"></script>
+            <script> 
+                $(document).ready(function(){
+                  $("#id_telephone").mask("(00) 0 0000-0000");
+                  $("#id_zip_code").mask("00000-000");
+              });
+
+                $(document).ready(function(){
+                  $('#id_zip_code').on('blur', function(){
+                      var cep = $(this).val().replace('-', '');
+                      if (cep.length === 8) {
+                          $.ajax({
+                              url: '/check_zipcode/',
+                              data: {'cep': cep},
+                              dataType: 'json',
+                              success: function(data){
+                                  $('#id_address').val(data.logradouro);
+                                  $('#id_neighborhood').val(data.bairro);
+                                  $('#id_city').val(data.cidade);
+                                  $('#id_state').val(data.estado);
+                              }
+                          });
+                      }
+                  });
+              });
+            </script>
+        {% endblock %}
+    </body>
+</html>
+{% endblock %}

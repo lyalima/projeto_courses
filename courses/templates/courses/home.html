@@ -1,0 +1,57 @@
+{% extends "courses/base.html" %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <title>{% block title %}Home{% endblock %}</title> 
+        <style>
+            .buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+      
+        .btn {
+            display: inline-block;
+            background-color: #0096c7;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            margin: 0 10px;
+        }
+      
+        .btn:hover {
+            background-color: #108eb8;
+        }
+        </style>
+    </head>
+    <body class="bg-light">
+        <header class="my-5">
+            <div class="container px-5">
+                <div class="row gx-5 justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="text-center my-5">
+                            <a href="https://www.flaticon.com/br/icones-gratis/estude" target="_blank"><img width="20%" class="icone-estudando mx-3" src="{% static 'img/estudando1.png' %}"></a>
+                            <a href="https://www.flaticon.com/br/icones-gratis/estude" target="_blank"><img width="20%" class="icone-estudando mx-3" src="{% static 'img/estudando2.png' %}"></a>
+                            <a href="https://www.flaticon.com/br/icones-gratis/computador-portatil" target="_blank"><img width="20%" class="icone-estudando mx-3" src="{% static 'img/estudando3.png' %}"></a>
+                            <h1 class="display-5 fw-bolder text-black mb-2 my-3">Seja Bem Vindo(a)</h1>
+                            <p class="lead text-black-50 mb-4">Seus cursos gratuitos em um só lugar!</p>
+                            <div class="buttons-container d-grid gap-3 d-sm-flex justify-content-sm-center">
+                                <a class="btn btn-primary btn-lg px-4 me-sm-3" href="{% url 'login_view'%}">Login</a>
+                                <a class="btn btn-primary btn-lg px-4" href="{% url 'register_view'%}">Cadastre-se</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </body>
+</html>
+{% endblock %}
