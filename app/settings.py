@@ -78,7 +78,7 @@ DATABASES = {
         'NAME': 'cursos',
         'USER': 'postgres',
         'PASSWORD': config('PASSWD_POSTGRESQL'),
-        'HOST': 'cursos.cp0mm8k0ktpn.us-east-1.rds.amazonaws.com',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -119,13 +119,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-'''STATICFILES_DIRS = [
+STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
-]'''
+]
+
+#Media Files
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -135,9 +135,15 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#Custom User
+
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+#Backend Email
+
 AUTHENTICATION_BACKENDS = ['app.backends.EmailBackend']
+
+#Date Settings
 
 DATE_FORMAT = 'd/m/Y'
 
@@ -145,8 +151,8 @@ DATETIME_FORMAT = 'd/m/Y - H:i:s'
 
 DATE_INPUT_FORMATS = ['%d/%m/%Y']
 
-
 #Messages
+
 MESSAGE_TAGS = {
     constants.DEBUG: 'alert-primary',
     constants.ERROR: 'alert-danger',
@@ -155,8 +161,8 @@ MESSAGE_TAGS = {
     constants.INFO: 'alert-info',
 }
 
+#Email Configuration
 
-# Email backend configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
