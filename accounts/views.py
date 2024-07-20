@@ -2,9 +2,8 @@ from django.shortcuts import render, redirect
 from django.shortcuts import redirect, get_object_or_404
 from django.http import Http404
 from django.contrib import messages
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView, FormView
-from django.views.generic import View
+from django.urls import reverse_lazy, reverse
+from django.views.generic import View, CreateView, UpdateView, DetailView, ListView, DeleteView, FormView
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import *
@@ -13,8 +12,11 @@ from courses.models import Course, CourseCategory
 from django.http import JsonResponse
 import requests
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from django.http import HttpResponse
-
+from decouple import config 
+from django.core.mail import send_mail
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+import uuid
 
 class RegisterView(CreateView):
 
@@ -33,7 +35,18 @@ class VerifyEmailView(FormView):
 
     template_name = 'accounts/verify_email.html'
     form_class = VerificationForm
-    success_url = reverse_lazy('login_view')
+    
+    def get_success_url(self):
+
+        user = self.request.user
+
+        if user.is_authenticated:
+    
+            return reverse_lazy('profile_detail_view', kwargs={'pk': user.pk})
+        
+        else:
+
+            return reverse_lazy('login_view')
 
     def form_valid(self, form):
 
@@ -41,17 +54,21 @@ class VerifyEmailView(FormView):
 
         try:
 
+            uuid.UUID(code)
             user = CustomUser.objects.get(verification_code=code)
             user.email_verified = True
             user.save()
-            messages.success(self.request, 'Usuário cadastrado e Email verificado com sucesso!')
-
+            self.verified_user = user
+            messages.success(self.request, 'Email verificado com sucesso!')
+            
             return super().form_valid(form)
         
-        except:
-
+        except ValueError:
             messages.error(self.request, 'Código de verificação inválido.')
-            
+            return self.form_invalid(form)
+        
+        except CustomUser.DoesNotExist:
+            messages.error(self.request, 'Código de verificação inválido.')
             return self.form_invalid(form)
     
 class LoginView(View):
@@ -103,12 +120,15 @@ class LogoutView(View):
         logout(request)
 
         return redirect('home_view')
-    
+
+@method_decorator(login_required(login_url='login_view'), name='dispatch')
 class ProfileView(DetailView):
 
     model = CustomUser
     template_name = 'accounts/profile.html'
+    context_object_name = 'user'
 
+@method_decorator(login_required(login_url='login_view'), name='dispatch')
 class ProfileUpdateView(UpdateView):
 
     model = CustomUser
@@ -125,7 +145,8 @@ class ProfileUpdateView(UpdateView):
         messages.success(self.request, 'Dados atualizados com sucesso!')
 
         return response
-    
+
+@method_decorator(login_required(login_url='login_view'), name='dispatch')
 class AddCourseView(View):
 
     def post(self, request, course_id):
@@ -136,7 +157,8 @@ class AddCourseView(View):
 
         return redirect('my_courses_list_view')
 
-class MyCoursesListView(LoginRequiredMixin, ListView):
+@method_decorator(login_required(login_url='login_view'), name='dispatch')
+class MyCoursesListView(ListView):
 
     model = CustomUser
     template_name = 'accounts/my_courses.html'
@@ -177,12 +199,14 @@ class MyCoursesListView(LoginRequiredMixin, ListView):
 
         return context
 
+@method_decorator(login_required(login_url='login_view'), name='dispatch')
 class UserCourseDetailView(DetailView):
 
     model = Course
     template_name = 'accounts/user_course_detail.html'
     context_object_name = 'course'
 
+@method_decorator(login_required(login_url='login_view'), name='dispatch')
 class UserCourseDeleteView(DeleteView):
 
     model = CustomUser
@@ -210,7 +234,22 @@ class UserCourseDeleteView(DeleteView):
         messages.error(request, f'Curso "{course.course_name}" excluído com sucesso!')
 
         return redirect('my_courses_list_view')
-    
+
+class SendVerificationEmailView(View):
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+
+        if user.is_authenticated:
+            subject = 'Verifique seu endereço de email'
+            message = f'Use este código para verificar seu email: {user.verification_code}'
+            from_email = config('EMAIL_ADDRESS')
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list)
+        else:
+            messages.error(request, 'Você precisa estar logado para realizar esta ação.')
+
+        return redirect(reverse_lazy('verify_email_view'))
+
 def check_zipcode_view(request):
 
     if request.method == 'GET':
@@ -236,8 +275,3 @@ def check_zipcode_view(request):
             
     return JsonResponse({'error': 'CEP inválido'}, status=400)
 
-
-#view para verificação de integridade feita pelo asg aws:
-def health_check(request):
-    
-    return HttpResponse("OK", status=200)

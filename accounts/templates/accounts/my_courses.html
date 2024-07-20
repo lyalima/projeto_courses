@@ -173,15 +173,18 @@
         <h3 class="mx-5">Resultados para o filtro "{{ selected_category.category_name }}"</h3>
         <hr>
       {% else %}
+      {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                 <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+      {% endif %}
         <h3 class="mx-5"> Meus Cursos </h3>
         <hr>
-      {% endif %}
-      {% if messages %}
-        <ul class="messages">
-          {% for message in messages %}
-            <li {% if message.tags %}class="alert {{ message.tags }}" {% endif %}> {{ message }}</li> 
-          {% endfor %}
-        </ul>
       {% endif %}
       <div class="course-grid">
           {% if courses %}

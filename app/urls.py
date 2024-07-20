@@ -9,6 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("home/", HomeView.as_view(), name='home_view'),
     path("register/", RegisterView.as_view(), name='register_view'), 
+    path('send_verification_email/', SendVerificationEmailView.as_view(), name='send_verification_email_view'),
     path('verify_email/', VerifyEmailView.as_view(), name='verify_email_view'),
     path("check_zipcode/", check_zipcode_view, name='check_zipcode'),
     path("login/", LoginView.as_view(), name='login_view'), 
@@ -26,5 +27,4 @@ urlpatterns = [
     path('courses/', CoursesListView.as_view(), name='courses_list_view'),
     path('course/<int:pk>/', CourseDetailView.as_view(), name='course_detail_view'),
     path('vacancies/', VacanciesListView.as_view(), name='vacancies_list_view'),
-    path('health/', health_check, name='health_check'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

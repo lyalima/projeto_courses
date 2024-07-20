@@ -135,11 +135,23 @@
         <main>
         <a title="Voltar" href={% url 'courses_list_view' %}><i class="fa fa-arrow-circle-left mx-5 my-3" aria-hidden="true"></i></a>
         {% if messages %}
-          <ul class="messages">
-            {% for message in messages %}
-              <li {% if message.tags %}class="alert {{ message.tags }}" {% endif %}> {{ message }}</li> 
-            {% endfor %}
-          </ul>
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if not user.email_verified %}
+            <div class="container mt-3">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    Seu email ainda não foi validado. 
+                    <a href="{% url 'send_verification_email_view' %}" class="bg-success ms-2 btn-success btn">Validar Email</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
         {% endif %}
         <div class="container px-5 my-5 px-5">
             <div class="text-center mb-5">
