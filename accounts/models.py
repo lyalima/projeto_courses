@@ -48,7 +48,7 @@ class CustomUser(AbstractUser):
     city = models.CharField(max_length=50, null=False, blank=False, verbose_name='Cidade')
     state = models.CharField(max_length=2, null=False, blank=False, verbose_name='Estado')
     education = models.CharField(max_length=30, choices=choices_education, verbose_name='Escolaridade')
-    areas_of_interest = MultipleSelectionField(blank=True, null=True, choices=choices_areas, max_length=50, verbose_name='Áreas de Interesse')
+    areas_of_interest = MultipleSelectionField(blank=True, null=True, choices=choices_areas, max_length=1000, verbose_name='Áreas de Interesse')
     photo = models.ImageField(upload_to='profile/', blank=True, null=True)
     user_courses = models.ManyToManyField(Course, related_name='courses')
 
