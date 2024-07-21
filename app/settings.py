@@ -78,7 +78,7 @@ DATABASES = {
         'NAME': 'courses',
         'USER': 'postgres',
         'PASSWORD': config('PASSWD_POSTGRESQL'),
-        'HOST': 'localhost',
+        'HOST': config('HOST'),
         'PORT': '5432',
     }
 }
