@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'courses',
     'crispy_forms',
     'crispy_bootstrap5',
+    'cpf_field',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -77,7 +78,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'courses',
         'USER': 'postgres',
-        'PASSWORD': config('PASSWD_POSTGRESQL'),
+        'PASSWORD': config('PASSWORD_POSTGRES'),
         'HOST': config('HOST'),
         'PORT': '5432',
     }
@@ -119,11 +120,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-'''STATICFILES_DIRS = [
+STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
-]'''
+]
 
 #Media Files
 

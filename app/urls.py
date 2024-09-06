@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from accounts.views import *
 from courses.views import *
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("home/", HomeView.as_view(), name='home_view'),

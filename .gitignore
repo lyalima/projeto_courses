@@ -3,6 +3,4 @@ venv/
 .env
 uwsgi_params
 cursos_uwsgi.ini
-
-
-
+.flake8
