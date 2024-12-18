@@ -170,3 +170,12 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_ADDRESS')  
 EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
+
+
+# Celery
+
+CELERY_BROKER_URL = 'pyamqp://guest@localhost//'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Sao_Paulo'

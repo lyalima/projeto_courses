@@ -40,7 +40,6 @@ class CustomUser(AbstractUser):
     date_of_birth = models.DateField(blank=True, null=True, verbose_name='Data de Nascimento')
     email = models.EmailField(max_length=100, blank=False, null=False)
     email_verified = models.BooleanField(null=True, blank=True, default=False, verbose_name='Email Verificado')
-    verification_code = models.UUIDField(null=True, blank=True, default=uuid.uuid4, editable=False, verbose_name='Código')
     telephone = models.CharField(max_length=16, blank=False, null=False, verbose_name='Telefone')
     zip_code = models.CharField(max_length=9, blank=False, null=False, verbose_name='CEP')
     address = models.CharField(max_length=50, blank=False, null=False, verbose_name='Endereço')
@@ -54,7 +53,11 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
-    
-    
 
 
+class UserEmailVerificationCode(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    code = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.code}' 

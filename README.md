@@ -14,8 +14,34 @@ O projeto conta com funcionalidades como:
   - Filtragem e busca de cursos e vagas;
   - Uso do banco de dados PostgreSQL.
 
-As funcionalidades do projeto foram desenvovidades utilizando recursos do Django como: Class-Based-View, Forms com Crispy-Forms, Signals, entre outros.
+As funcionalidades do projeto foram desenvovidades utilizando recursos do Django como: Class-Based-View, Forms com Crispy-Forms, entre outros.
 
-Para instalar as dependências necessárias para usar o projeto, execute: pip install -r./requirements.txt.
+Além dessas funcionalidades, foi implementado o envio de email assíncrono com Celery e RabbitMQ integrados com Django.
 
-Atente-se à configuração de algumas credenciais que estão como variáveis de ambiente.
+Para instalar as dependências necessárias para usar o projeto, execute:
+
+```bash
+pip install -r./requirements.txt
+```
+
+Para executar o projeto use: 
+(Atente-se às configurações do banco de dados e de algumas credenciais que estão como variáveis de ambiente)
+
+```bash
+python manage.py migrate
+
+python manage.py runserver
+```
+
+Para executar o RabbitMQ use: 
+(Certifique-se de ter o Docker instalado)
+
+```bash
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13-management
+```
+
+Para executar o Celery use: 
+
+```bash
+celery -A app worker -l INFO
+```

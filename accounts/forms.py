@@ -47,7 +47,7 @@ class CustomUserCreationForm(UserCreationForm):
         return email_address
 
 
-class CustomAuthenticationForm(AuthenticationForm):
+class CustomUserAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
         label='Usuário/Email', 
     )
@@ -91,5 +91,5 @@ class CustomUserChangeForm(UserChangeForm):
             return self.instance
 
 
-class VerificationForm(forms.Form):
+class CustomUserVerificationForm(forms.Form):
     code = forms.CharField(max_length=64)

@@ -2,74 +2,99 @@ from django.shortcuts import render, redirect
 from django.shortcuts import redirect, get_object_or_404
 from django.http import Http404
 from django.contrib import messages
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from django.views.generic import View, CreateView, UpdateView, DetailView, ListView, DeleteView, FormView
 from django.contrib.auth import login, logout
-from .forms import *
-from .models import CustomUser
+from .forms import CustomUserCreationForm, CustomUserAuthenticationForm, CustomUserVerificationForm, CustomUserChangeForm
+from .models import CustomUser, UserEmailVerificationCode
+from utils.email_code_generator import email_code_generator
 from courses.models import Course, CourseCategory
 from django.http import JsonResponse
 import requests
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from decouple import config 
-from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-import uuid
 
 
 class RegisterView(CreateView):
     form_class = CustomUserCreationForm
     template_name = 'accounts/register.html'
-    success_url = reverse_lazy('verify_email_view')
+    success_url = reverse_lazy('login_view')
 
     def form_valid(self, form):
-        response = super().form_valid(form)
         form.save()
-        return response
+        messages.success(self.request, 'Cadastro realizado com sucesso!')
 
-
-class VerifyEmailView(FormView):
-    template_name = 'accounts/verify_email.html'
-    form_class = VerificationForm
-    
-    def get_success_url(self):
-        user = self.request.user
-        if user.is_authenticated:
-            return reverse_lazy('profile_detail_view', kwargs={'pk': user.pk})
-        else:
-            return reverse_lazy('login_view')
-
-    def form_valid(self, form):
-        code = form.cleaned_data.get('code')
-        try:
-            uuid.UUID(code)
-            user = CustomUser.objects.get(verification_code=code)
-            user.email_verified = True
-            user.save()
-            self.verified_user = user
-            messages.success(self.request, 'Email verificado com sucesso!')
-            return super().form_valid(form)
-        except ValueError:
-            messages.error(self.request, 'Código de verificação inválido.')
-            return self.form_invalid(form)
-        except CustomUser.DoesNotExist:
-            messages.error(self.request, 'Código de verificação inválido.')
-            return self.form_invalid(form)
+        return super().form_valid(form)
 
 
 class LoginView(View):
 
     def get(self, request):
-        form = CustomAuthenticationForm()
+        form = CustomUserAuthenticationForm
         return render(request, 'accounts/login.html', {'form': form})
 
     def post(self, request):
-        form = CustomAuthenticationForm(data=request.POST)
+        form = CustomUserAuthenticationForm(data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
             return redirect(reverse_lazy('courses_list_view'))
         return render(request, 'accounts/login.html', {'form': form})
+
+
+class LogoutView(View):
+
+    def get(self, request):
+        logout(request)
+        return redirect('home_view')
+
+
+@method_decorator(login_required(login_url='login_view'), name='dispatch')
+class VerifyEmailView(FormView):
+    template_name = 'accounts/verify_email.html'
+    form_class = CustomUserVerificationForm
+    
+    def get_success_url(self):
+        user = self.request.user
+
+        return reverse_lazy('profile_detail_view', kwargs={'pk': user.pk})
+        
+
+    def form_valid(self, form):
+        code_entered = form.cleaned_data.get('code')
+
+        try:
+            user_code = UserEmailVerificationCode.objects.get(code=code_entered)
+            self.request.user.email_verified = True
+            self.request.user.save()
+            user_code.delete()
+            messages.success(self.request, 'Email verificado com sucesso!')
+
+            return super().form_valid(form)
+        except UserEmailVerificationCode.DoesNotExist:
+            messages.error(self.request, 'Código de verificação inválido.')
+
+            return self.form_invalid(form)
+
+
+class SendVerificationEmailView(View):
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+
+        if user.is_authenticated:
+            if not user.email_verified:
+                try:
+                    old_code = UserEmailVerificationCode.objects.get(user=user)
+                    if old_code:
+                        old_code.delete()
+                        email_code_generator(user.id)
+                    else:
+                        email_code_generator(user.id)
+                except UserEmailVerificationCode.DoesNotExist as e:
+                    email_code_generator(user.id)
+
+        return redirect(reverse_lazy('verify_email_view'))
 
 
 class MyPasswordResetConfirm(PasswordResetConfirmView):
@@ -78,6 +103,7 @@ class MyPasswordResetConfirm(PasswordResetConfirmView):
         self.user.is_active = True
         self.user.save()
         return super(MyPasswordResetConfirm, self).form_valid(form)
+    
     template_name = 'accounts/password_reset_confirm.html'
 
 
@@ -91,13 +117,6 @@ class MyPasswordReset(PasswordResetView):
 
 class MyPasswordResetDone(PasswordResetDoneView):
     template_name = 'accounts/password_reset_done.html'
-
-
-class LogoutView(View):
-
-    def get(self, request):
-        logout(request)
-        return redirect('home_view')
 
 
 @method_decorator(login_required(login_url='login_view'), name='dispatch')
@@ -189,21 +208,6 @@ class UserCourseDeleteView(DeleteView):
         user.user_courses.remove(course)  
         messages.error(request, f'Curso "{course.course_name}" excluído com sucesso!')
         return redirect('my_courses_list_view')
-
-
-class SendVerificationEmailView(View):
-
-    def get(self, request, *args, **kwargs):
-        user = self.request.user
-        if user.is_authenticated:
-            subject = 'Verifique seu endereço de email'
-            message = f'Use este código para verificar seu email: {user.verification_code}'
-            from_email = config('EMAIL_ADDRESS')
-            recipient_list = [user.email]
-            send_mail(subject, message, from_email, recipient_list)
-        else:
-            messages.error(request, 'Você precisa estar logado para realizar esta ação.')
-        return redirect(reverse_lazy('verify_email_view'))
 
 
 def check_zipcode_view(request):
