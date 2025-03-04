@@ -1,0 +1,56 @@
+services:
+
+  db:
+    container_name: db-courses
+    image: postgres:13-alpine
+    volumes:
+      - ./data/db:/var/lib/postgresql/data:delegated
+    environment:
+    - POSTGRES_DB=courses
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=postgres
+  
+  rabbitmq:
+    container_name: rabbitmq-courses
+    image: rabbitmq:3-management
+    ports:
+    - "15672:15672"
+    - "5672:5672"
+
+  courses:
+    container_name: courses
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    restart: always
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbitmq
+    env_file: 
+      - .env
+    environment:
+      EMAIL_ADDRESS: ${EMAIL_ADDRESS}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+  
+  celery:
+    container_name: celery-courses
+    build: .
+    command: celery -A app worker -l info
+    restart: always
+    volumes:
+    - .:/app
+    depends_on:
+      - db
+      - rabbitmq
+
+  redis:
+    container_name: redis-courses
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    depends_on:
+      - db
+    restart: always

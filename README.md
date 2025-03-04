@@ -45,3 +45,36 @@ Para executar o Celery use:
 ```bash
 celery -A app worker -l INFO
 ```
+
+## Uso com Docker
+
+### Requisitos 
+
+- Docker 
+- Docker Compose
+
+### Construir e iniciar os containers
+
+```bash
+docker-compose up --build
+```
+
+A aplicação estará disponível em http://127.0.0.1:8000/.
+
+### Executando comandos no container
+
+```bash
+docker-compose exec courses <comando>
+```
+
+### Exemplo de comando: aplicar as migrações no container
+
+```bash
+docker-compose exec courses python manage.py migrate
+```
+
+### Acessar o shell do container
+
+```bash
+docker exec -it courses /bin/bash
+```

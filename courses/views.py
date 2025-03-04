@@ -1,3 +1,4 @@
+from django.core.cache import caches
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -20,14 +21,21 @@ class CoursesListView(ListView):
     paginate_by = 3
 
     def get_queryset(self):
-        queryset = super().get_queryset().order_by('course_category')
+        courses_cache = caches['courses_cache']
+        cache_key = 'courses_list'
+        queryset = courses_cache.get(cache_key)
         search = self.request.GET.get('search')
         category = self.request.GET.get('category')
+
+        if not queryset:
+            queryset = super().get_queryset().order_by('course_category')
+            courses_cache.set(cache_key, queryset, timeout=3600)
         if search:
             queryset = queryset.filter(course_name__icontains=search)
         if category:
             queryset = queryset.filter(course_category_id=category)
         return queryset
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -45,6 +53,17 @@ class CourseDetailView(DetailView):
     model = Course
     template_name = 'courses/course_detail.html'
 
+    def get_object(self, queryset=None):
+        courses_cache = caches['courses_cache']
+        cache_key = f'course_detail_{self.kwargs["pk"]}'
+        course = courses_cache.get(cache_key)
+
+        if not course:
+            course = super().get_object(queryset)
+            courses_cache.set(cache_key, course, timeout=3600)
+
+        return course
+
 
 @method_decorator(login_required(login_url='login_view'), name='dispatch')
 class VacanciesListView(ListView):
@@ -54,11 +73,18 @@ class VacanciesListView(ListView):
     paginate_by = 3
 
     def get_queryset(self):
-        queryset = super().get_queryset().order_by('vacancy_category')
-        category = self.request.GET.get('category')
-        if category:
-            queryset = queryset.filter(vacancy_category_id=category)
+        courses_cache = caches['courses_cache']
+        cache_key = 'vacancies_list'
+        queryset = courses_cache.get(cache_key)
+
+        if not queryset:
+            queryset = super().get_queryset().order_by('vacancy_category')
+            category = self.request.GET.get('category')
+            if category:
+                queryset = queryset.filter(vacancy_category_id=category)
+            courses_cache.set(cache_key, queryset, timeout=3600)
         return queryset
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

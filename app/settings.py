@@ -1,5 +1,5 @@
-from pathlib import Path
 import os
+from pathlib import Path
 from django.contrib.messages import constants
 from decouple import config
 
@@ -76,11 +76,11 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'courses',
-        'USER': 'postgres',
-        'PASSWORD': config('PASSWORD_POSTGRES'),
-        'HOST': config('HOST'),
-        'PORT': '5432',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 
@@ -171,11 +171,36 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_ADDRESS')  
 EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
 
-
 # Celery
 
-CELERY_BROKER_URL = 'pyamqp://guest@localhost//'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+CELERY_BROKER_URL = 'pyamqp://guest@rabbitmq//'
 CELERY_TIMEZONE = 'America/Sao_Paulo'
+
+# Cache
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': 'default',
+    },
+    'courses_cache': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': 'courses',
+    },
+    'accounts_cache': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': 'accounts',
+    },
+}

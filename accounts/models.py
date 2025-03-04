@@ -2,7 +2,6 @@ from django.db import models
 from courses.models import Course
 from django.contrib.auth.models import AbstractUser
 from multipleselectionfield import MultipleSelectionField
-import uuid
 from cpf_field.models import CPFField
 
     
